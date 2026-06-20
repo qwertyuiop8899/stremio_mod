@@ -63954,7 +63954,12 @@
           seenDomains[domain] = true;
           promises.push(new Promise(function(resolve) {
             needle.get('https://' + domain, { follow_max: 5, timeout: 5000 }, function(err, resp) {
-              if (!err && resp && resp.request && resp.request.uri && resp.request.uri.hostname && resp.request.uri.hostname !== domain) {
+              if (err || !resp || resp.statusCode >= 400) {
+                if (domain === 'calpezz8.space') {
+                  console.log("[Proxy] Fallito calpezz8.space, applico fallback su vixsrc.to");
+                  code = code.split('calpezz8.space').join('vixsrc.to');
+                }
+              } else if (resp.request && resp.request.uri && resp.request.uri.hostname && resp.request.uri.hostname !== domain) {
                 code = code.split(domain).join(resp.request.uri.hostname);
               }
               resolve();
@@ -66411,7 +66416,7 @@
                                   if (isCinemacity && !s.language) {
                                     return null;
                                   }
-                                  if (cleanUrl.indexOf('streamingcommunity') !== -1) {
+                                  if (cleanUrl.indexOf('streamingcommunity') !== -1 || s.provider === 'streamingcommunity') {
                                     var qIdx = cleanUrl.indexOf('?');
                                     if (qIdx !== -1) {
                                       var pathPart = cleanUrl.substring(0, qIdx);
@@ -66425,7 +66430,7 @@
                                       }
                                     }
                                   }
-                                  if (isNetmirror || cleanUrl.indexOf('streamingcommunity') !== -1 || cleanUrl.indexOf('vixsrc.to') !== -1 || cleanUrl.indexOf('cinemacity') !== -1 || s.provider === 'cinemacity') {
+                                  if (isNetmirror || cleanUrl.indexOf('streamingcommunity') !== -1 || cleanUrl.indexOf('vixsrc.to') !== -1 || cleanUrl.indexOf('cinemacity') !== -1 || s.provider === 'cinemacity' || s.provider === 'streamingcommunity') {
                                     var pHeaders = s.headers || {};
                                     cleanUrl = proto + "://" + reqHost + "/plugin/m3u8-proxy.m3u8?url=" + encodeURIComponent(cleanUrl);
                                     if (pHeaders && Object.keys(pHeaders).length > 0) {
